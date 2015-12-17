@@ -86,6 +86,44 @@ def post_log():
         obmenMonitorService.addObmenLogItem(li)
     return render_template(u'index.html')
 
+@app.route("/put_log", methods=['PUT'])
+#@requires_auth
+def put_log():
+    #print(request.data)
+    obmenMonitorService= ObmenMonitorService()
+    root = ET.fromstring(request.data)
+    client_id = root.attrib['IDKlient']
+    for child in root:
+        try:
+            period = datetime.strptime(child.attrib['period'],'%d.%m.%Y %H:%M:%S')
+        except:
+            period = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+
+        li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
+        li.Comment_vigruzka = child.attrib['comment_vigruzka']
+        li.Comment_zagruzka = child.attrib['comment_zagruzka']
+        li.Rezult_posl_vigr = child.attrib['rezult_posl_vigr']
+        li.Rezult_posl_zagr = child.attrib['rezult_posl_zagr']
+        try:
+            li.Data_posl_zagr = datetime.strptime(child.attrib['data_posl_zagr'],'%d.%m.%Y %H:%M:%S')
+        except:
+            li.Data_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        try:
+            li.Data_posl_vigr = datetime.strptime(child.attrib['data_posl_vigr'],'%d.%m.%Y %H:%M:%S')
+        except:
+            li.Data_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        try:
+            li.Data_nachala_posl_vigr = datetime.strptime(child.attrib['data_nachala_posl_vigr'],'%d.%m.%Y %H:%M:%S')
+        except:
+            li.Data_nachala_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        try:
+            li.Data_nachala_posl_zagr = datetime.strptime(child.attrib['data_nachala_posl_zagr'],'%d.%m.%Y %H:%M:%S')
+        except:
+            li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+
+        obmenMonitorService.addObmenLogItem(li)
+    return render_template(u'index.html')    
+
 
 if __name__ == "__main__":
    app.secret_key = 'sadkghsdkjfghadjghjksdgh'
