@@ -40,7 +40,7 @@ def hello(errors=None):
     return render_template(u'index.html', errors=errors, log_list=log_list)
 
 @app.route("/log")
-@requires_auth
+#@requires_auth
 def log_items(errors=None):
     log_list=True
     obmenMonitorService= ObmenMonitorService()
@@ -49,7 +49,7 @@ def log_items(errors=None):
 
 
 @app.route("/post_log", methods=['POST'])
-@requires_auth
+#@requires_auth
 def post_log():
     #print(request.data)
     obmenMonitorService= ObmenMonitorService()
@@ -89,4 +89,4 @@ def post_log():
 
 if __name__ == "__main__":
    app.secret_key = 'sadkghsdkjfghadjghjksdgh'
-   app.run(host='localhost',port=8080, debug=True)
+   app.run(host='localhost',port=8080, debug=False)
