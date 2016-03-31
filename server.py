@@ -89,4 +89,4 @@ def post_log():
 
 if __name__ == "__main__":
    app.secret_key = 'sadkghsdkjfghadjghjksdgh'
-   app.run(host='localhost',port=8080, debug=True)
+   app.run(host='localhost',port=8088, debug=True)
