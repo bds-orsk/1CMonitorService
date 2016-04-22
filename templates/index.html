@@ -10,8 +10,6 @@
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/ObmenMonitor.css" rel="stylesheet">
-    <link href="/static/css/jquery-ui.css" rel="stylesheet">
-    <link href="/static/css/theme.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -20,28 +18,8 @@
     <![endif]-->
 
     <script src="static/js/jquery.js"></script>
-    <script src="static/js/jquery-ui.min.js"></script>
 
-    <script>
-  $(function() {
-    $( "#dialog-about" ).dialog({
-      modal: true,
-      autoOpen: false,
-      show: {
-        effect: "blind",
-        duration: 100
-      },
-      hide: {
-        effect: "blind",
-        duration: 100
-      }
-    });
 
-    $( "#open-about" ).click(function() {
-      $( "#dialog-about" ).dialog( "open" );
-    });
-  });
-  </script>
 
   </head>
   <body>
@@ -61,11 +39,15 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Монитор</a></li>
             <li ><a href="{{url_for('log_items')}}">Список данных</a></li>
-            <li><a href="#" id="open-about">О сервисе</a></li>
+            <li><a href="#" data-toggle="modal" data-target="#myModal">О сервисе</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
+
+
+
+
 
     <div class="container">
 
@@ -107,16 +89,23 @@
 
     </div><!-- /.container -->
 
-    <div id="dialog-about" title="О сервисе Монитор обмена">
-      <p>
-        <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
-        Монитор обмена баз 1С.
-      </p>
-
-      <p>
-        Версия <b>1.0.0.23</b>.
-      </p>
-    </div>
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">О сервисе</h4>
+      </div>
+      <div class="modal-body">
+        <p>Сервис мониторинга обмена данными между базами 1С предприятие.</p>
+        <p>Версия 1.0.1.23 от 22.04.2016</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>-->
     <!-- Include all compiled plugins (below), or include individual files as needed -->
