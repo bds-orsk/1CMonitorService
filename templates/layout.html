@@ -38,9 +38,28 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Монитор</a></li>
+            {% if session.logged_in %}
             <li ><a href="{{url_for('log_items')}}">Список данных</a></li>
+            {% endif %}
             <li><a href="#" data-toggle="modal" data-target="#myModal">О сервисе</a></li>
+
+            {% if session.logged_in %}
+              <li><a href="{{url_for('logout')}}">Выход({{session.username}})</a></li>
+              {% endif %}
           </ul>
+
+             {% if not session.logged_in %}
+          <form class="navbar-form navbar-right" role="form" action="{{ url_for('login') }}" method=post>
+            <div class="form-group">
+              <input type="text" name="username" placeholder="Login" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" name="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Вход</button>
+          </form>
+	  {% endif %}
+
         </div><!--/.nav-collapse -->
       </div>
     </nav>
@@ -51,12 +70,7 @@
 
     <div class="container">
 
-      <div class="starter-template">
-        <h1>Тестовый запуск сервиса</h1>
-        <p class="lead">Здесь в дальнейшем будет отбражена информация об обменах клиентов<br> Для отправки данных на сервер используйте адрес для подключения: <br>
-        	http://localhost:8080/post_log
-        </p>
-      </div>
+
 
         {% block body %}{% endblock %}
 
@@ -73,7 +87,7 @@
       </div>
       <div class="modal-body">
         <p>Сервис мониторинга обмена данными между базами 1С предприятие.</p>
-        <p>Версия 1.0.1.23 от 22.04.2016</p>
+        <p>Версия 1.0.2.15 от 26.04.2016</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>

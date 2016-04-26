@@ -37,15 +37,39 @@ def requires_auth(f):
 @app.route("/")
 def hello(errors=None):
     log_list=False
-    return render_template(u'show_log.html', errors=errors, log_list=log_list)
+    return render_template(u'index.html', errors=errors, log_list=log_list)
 
 @app.route("/log")
-@requires_auth
+#@requires_auth
 def log_items(errors=None):
     log_list=True
     obmenMonitorService= ObmenMonitorService()
     log_items = obmenMonitorService.getObmenLogItems()
     return render_template(u'show_log.html', log_items=log_items, log_list=log_list)
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if (request.form['username']=="kwl")&(request.form['password']=="123"):
+            error = u''
+            session['logged_in'] = True
+            session['username'] = request.form['username']
+            return redirect(url_for('hello'))
+        else:
+            error=u'Не верный  логин или пароль'
+            session['logged_in'] = False
+            session['username'] = ''
+            print(request.form.get('password',None))
+            return render_template(u'index.html', errors=error)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('username', '')
+    return redirect(url_for('hello'))
 
 
 @app.route("/post_log", methods=['POST'])

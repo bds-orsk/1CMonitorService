@@ -1,6 +1,14 @@
 {% extends "layout.html" %}
 {% block body %}
 
+{% if not session.logged_in %}
+  <div>
+    <h2>
+      Данный раздел только для авторизованных пользователей
+    </h2>
+  </div>
+{% else %}
+
 
       {% if log_list %}
       <table class="table">
@@ -30,6 +38,6 @@
         {% endfor %}
       </table>
       {% endif %}
-
+{% endif %}
 {% endblock %}
 
