@@ -45,6 +45,22 @@ class ObmenLogItem(Base):
                     Comment_vigruzka=self.Comment_vigruzka, Data_nachala_posl_zagr=self.Data_nachala_posl_zagr,
                     Data_nachala_posl_vigr=self.Data_nachala_posl_vigr)
 
+class ObmenLogClient(Base):
+     __tablename__ = u'obmen_client'
+
+     client_id = Column(String, primary_key=True)
+     client_name = Column(String)
+
+     def __init__(self, client_id, name):
+         self.client_id = client_id
+         self.client_name = name
+
+     def __repr__(self):
+        return "<Client id='%s'('%s')>" % (self.client_id, self.client_name)
+
+     def getDictonary(self):
+        return dict(client_id=self.client_id, name=self.client_id)
+
 
 class ObmenMonitorService():
 
@@ -56,7 +72,7 @@ class ObmenMonitorService():
         self.session.close()
 
     def getObmenLogItems(self):
-        log_items = self.session.query(ObmenLogItem).order_by(ObmenLogItem.period.asc()).all()
+        log_items = self.session.query(ObmenLogItem).order_by(ObmenLogItem.period.desc()).all()
         #log_items = ObmenLogItem.query.order_by(ObmenLogItem.period.desc()).all()
         entries = [s.getDictonary() for s in log_items]
         return entries
@@ -67,7 +83,17 @@ class ObmenMonitorService():
         self.session.merge(log_item)
         self.session.commit()
 
+    def addClientItem(self,client_item):
 
+        #self.session.add(log_item)
+        self.session.merge(client_item)
+        self.session.commit()
+
+    def getObmenClients(self):
+        client_items = self.session.query(ObmenLogClient).all()
+        #log_items = ObmenLogItem.query.order_by(ObmenLogItem.period.desc()).all()
+        entries = [s.getDictonary() for s in client_items]
+        return entries
 
 
 def main():
