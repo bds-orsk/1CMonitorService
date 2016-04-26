@@ -6,7 +6,7 @@ from functools import wraps
 
 import xml.etree.ElementTree as ET
 
-from ObmenMonitorDataService import ObmenLogItem, ObmenMonitorService
+from ObmenMonitorDataService import ObmenLogItem, ObmenMonitorService, ObmenLogClient
 
 from datetime import datetime
 
@@ -47,6 +47,13 @@ def log_items(errors=None):
     log_items = obmenMonitorService.getObmenLogItems()
     return render_template(u'show_log.html', log_items=log_items, log_list=log_list)
 
+@app.route("/clients")
+#@requires_auth
+def client_items(errors=None):
+    obmenMonitorService= ObmenMonitorService()
+    client_items = obmenMonitorService.getObmenClients()
+    return render_template(u'show_clients.html', client_items=client_items)
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -79,6 +86,8 @@ def post_log():
     obmenMonitorService= ObmenMonitorService()
     root = ET.fromstring(request.data)
     client_id = root.attrib['IDKlient']
+    client = ObmenLogClient(client_id,'')
+    obmenMonitorService.addClientItem(client)
     for child in root:
         try:
             period = datetime.strptime(child.attrib['period'],'%d.%m.%Y %H:%M:%S')
@@ -117,6 +126,8 @@ def put_log():
     obmenMonitorService= ObmenMonitorService()
     root = ET.fromstring(request.data)
     client_id = root.attrib['IDKlient']
+    client = ObmenLogClient(client_id,'')
+    obmenMonitorService.addClientItem(client)
     for child in root:
         try:
             period = datetime.strptime(child.attrib['period'],'%d.%m.%Y %H:%M:%S')

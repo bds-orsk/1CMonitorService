@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% if not session.logged_in %}
+  <div>
+    <h2>
+      Данный раздел только для авторизованных пользователей
+    </h2>
+  </div>
+{% else %}
+
+
+      {% if client_items %}
+      <table class="table">
+        <tr>
+          <td><b>ИДД Клиента</td>
+          <td><b>Имя</td>
+        </tr>
+        {% for item in client_items %}
+        <tr>
+          <td>{{ item.client_id }}</td>
+          <td>{{ item.client_name }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+{% endif %}
+{% endblock %}

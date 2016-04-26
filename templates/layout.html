@@ -39,7 +39,9 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Монитор</a></li>
             {% if session.logged_in %}
+            <li ><a href="{{url_for('client_items')}}">Клиенты</a></li>
             <li ><a href="{{url_for('log_items')}}">Список данных</a></li>
+
             {% endif %}
             <li><a href="#" data-toggle="modal" data-target="#myModal">О сервисе</a></li>
 
