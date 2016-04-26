@@ -37,7 +37,7 @@ def requires_auth(f):
 @app.route("/")
 def hello(errors=None):
     log_list=False
-    return render_template(u'index.html', errors=errors, log_list=log_list)
+    return render_template(u'show_log.html', errors=errors, log_list=log_list)
 
 @app.route("/log")
 @requires_auth
@@ -45,7 +45,7 @@ def log_items(errors=None):
     log_list=True
     obmenMonitorService= ObmenMonitorService()
     log_items = obmenMonitorService.getObmenLogItems()
-    return render_template(u'index.html', log_items=log_items, log_list=log_list)
+    return render_template(u'show_log.html', log_items=log_items, log_list=log_list)
 
 
 @app.route("/post_log", methods=['POST'])
@@ -84,7 +84,7 @@ def post_log():
             li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
 
         obmenMonitorService.addObmenLogItem(li)
-    return render_template(u'index.html')
+    return render_template(u'show_log.html')
 
 @app.route("/put_log", methods=['PUT'])
 @requires_auth
@@ -122,7 +122,7 @@ def put_log():
             li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
 
         obmenMonitorService.addObmenLogItem(li)
-    return render_template(u'index.html')    
+    return render_template(u'show_log.html')
 
 
 if __name__ == "__main__":

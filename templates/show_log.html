@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block body %}
+
+
+      {% if log_list %}
+      <table class="table">
+        <tr>
+          <td><b>ИДД Клиента</td>
+          <td><b>Период</td>
+          <td><b>Узел ИБ</td>
+          <td><b>Дата последней загрузки</td>
+          <td><b>Дата последней выгрузки</td>
+          <td><b>Результат последней загрузки</td>
+          <td><b>Результат последней выгрузки</td>
+          <td><b>Комментарий загрузки</td>
+          <td><b>Комментарий выгрузки</td>
+        </tr>
+        {% for log_item in log_items %}
+        <tr>
+          <td>{{ log_item.client_id }}</td>
+          <td>{{ log_item.period }}</td>
+          <td>{{ log_item.uzelib|safe }}</td>
+          <td>{{ log_item.Data_posl_zagr }}</td>
+          <td>{{ log_item.Data_posl_vigr }}</td>
+          <td>{{ log_item.Rezult_posl_zagr }}</td>
+          <td>{{ log_item.Rezult_posl_vigr }}</td>
+          <td>{{ log_item.Comment_zagruzka|safe }}</td>
+          <td>{{ log_item.Comment_vigruzka|safe }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+
+{% endblock %}
+
