@@ -54,6 +54,19 @@ def client_items(errors=None):
     client_items = obmenMonitorService.getObmenClients()
     return render_template(u'show_clients.html', client_items=client_items)
 
+@app.route("/edit_client/<clientid>", methods=['GET', 'POST'])
+def edit_client(clientid):
+    obmenMonitorService = ObmenMonitorService()
+    client = obmenMonitorService.getClientByID(clientid)
+    if request.method == 'POST':
+        client.client_name = request.form['name']
+        client.client_id = request.form['clientid']
+        #client.ib_key = request.form['ib_key']
+        obmenMonitorService.updateClient(client)
+        return redirect(url_for('client_items'))
+
+    return render_template(u'edit_client.html', client=client)
+
 
 @app.route('/login', methods=['POST'])
 def login():

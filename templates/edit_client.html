@@ -1,0 +1,14 @@
+﻿{% extends "layout.html" %}
+{% block body %}
+<h2>Редактирование клиента</h2>
+{% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+<form action="{{ url_for('edit_client', clientid=client.client_id)}}" method=post>
+<dl>
+<dt>Клиент:
+<dd><input type=text name=name value ={{client.client_name}}>
+<dd><input type=text name=clientid value ={{client.client_id}}>
+
+<dd><input type=submit value=Ок>
+</dl>
+</form>
+{% endblock %}

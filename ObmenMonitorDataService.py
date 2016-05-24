@@ -59,7 +59,7 @@ class ObmenLogClient(Base):
         return "<Client id='%s'('%s')>" % (self.client_id, self.client_name)
 
      def getDictonary(self):
-        return dict(client_id=self.client_id, name=self.client_id)
+        return dict(client_id=self.client_id, client_name=self.client_name)
 
 
 class ObmenMonitorService():
@@ -72,7 +72,8 @@ class ObmenMonitorService():
         self.session.close()
 
     def getObmenLogItems(self):
-        log_items = self.session.query(ObmenLogItem).order_by(ObmenLogItem.period.desc()).all()
+        #log_items = self.session.query(ObmenLogItem).order_by(ObmenLogItem.period.desc()).all()
+        log_items = self.session.query(ObmenLogItem).order_by(ObmenLogItem.period.desc()).slice(1,30)
         #log_items = ObmenLogItem.query.order_by(ObmenLogItem.period.desc()).all()
         entries = [s.getDictonary() for s in log_items]
         return entries
@@ -95,12 +96,19 @@ class ObmenMonitorService():
         entries = [s.getDictonary() for s in client_items]
         return entries
 
+    def getClientByID(self, client_id):
+        client = self.session.query(ObmenLogClient).filter_by(client_id=client_id).one()
+        return client
+
+    def updateClient(self,client_item):
+        self.session.merge(client_item)
+        self.session.commit()
 
 def main():
 
     metadata.create_all()
     obmenMonitorService= ObmenMonitorService()
-
+    #obmenMonitorService.updateClient(ObmenLogClient('123123','First client'))
  
 if __name__ == '__main__':
     main()

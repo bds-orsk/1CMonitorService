@@ -13,13 +13,17 @@
       {% if client_items %}
       <table class="table">
         <tr>
-          <td><b>ИДД Клиента</td>
+          <td><b>...</td>
           <td><b>Имя</td>
+          <td><b>ИДД Клиента</td>
         </tr>
         {% for item in client_items %}
         <tr>
-          <td>{{ item.client_id }}</td>
-          <td>{{ item.client_name }}</td>
+            <td><a href="{{ url_for('edit_client', clientid=item.client_id) }}">
+	            <span class="glyphicon glyphicon-pencil"></span></td>
+
+            <td>{{ item.client_name }}</td>
+            <td>{{ item.client_id }}</td>
         </tr>
         {% endfor %}
       </table>
