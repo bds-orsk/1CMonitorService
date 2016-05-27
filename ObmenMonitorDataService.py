@@ -121,9 +121,14 @@ class ObmenMonitorService():
 
     def addClientItem(self,client_item):
 
-        #self.session.add(log_item)
-        self.session.add(client_item)
-        self.session.commit()
+        instance = self.session.query(ObmenLogClient).filter_by(client_id=client_item.client_id).first()
+
+        if instance:
+            return instance
+        else:
+            self.session.add(client_item)
+            self.session.commit()
+            return instance
 
     def getObmenClients(self):
         client_items = self.session.query(ObmenLogClient).all()
