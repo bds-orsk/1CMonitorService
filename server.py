@@ -6,7 +6,7 @@ from functools import wraps
 
 import xml.etree.ElementTree as ET
 
-from ObmenMonitorDataService import ObmenLogItem, ObmenMonitorService, ObmenLogClient
+from ObmenMonitorDataService import ObmenLogItem, ObmenMonitorService, ObmenLogClient, ObmenCurrentErrorItem
 
 from datetime import datetime
 
@@ -37,7 +37,9 @@ def requires_auth(f):
 @app.route("/")
 def hello(errors=None):
     log_list=False
-    return render_template(u'index.html', errors=errors, log_list=log_list)
+    obmenMonitorService= ObmenMonitorService()
+    client_items = obmenMonitorService.getObmenClients()
+    return render_template(u'index.html', errors=errors, log_list=log_list, client_items=client_items)
 
 @app.route("/log")
 #@requires_auth
@@ -130,6 +132,13 @@ def post_log():
             li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
 
         obmenMonitorService.addObmenLogItem(li)
+
+        if (li.Rezult_posl_zagr == "Нет"):
+            li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
+            ei = ObmenCurrentErrorItem(client_id, period, li.uzelib)
+            ei.Comment_vigruzka = li.Comment_vigruzka
+            obmenMonitorService.addObmenErrorItem(ei)
+
     return render_template(u'show_log.html')
 
 @app.route("/put_log", methods=['PUT'])
@@ -170,6 +179,12 @@ def put_log():
             li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
 
         obmenMonitorService.addObmenLogItem(li)
+
+        if (li.Rezult_posl_zagr == "Нет"):
+            li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
+            ei = ObmenCurrentErrorItem(client_id, period, li.uzelib)
+            ei.Comment_vigruzka = li.Comment_vigruzka
+            obmenMonitorService.addObmenErrorItem(ei)
     return render_template(u'show_log.html')
 
 

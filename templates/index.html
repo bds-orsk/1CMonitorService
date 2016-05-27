@@ -1,9 +1,26 @@
 {% extends "layout.html" %}
 {% block body %}
-     <div class="starter-template">
-        <h1>Тестовый запуск сервиса</h1>
-        <p class="lead">Здесь в дальнейшем будет отбражена информация об обменах клиентов<br> Для отправки данных на сервер используйте адрес для подключения: <br>
-        	http://localhost:8080/post_log
-        </p>
-      </div>
+<div class="starter-template">
+
+    <h1></h1>
+
+    <p class="lead">
+        Тестовый запуск сервиса
+    </p>
+    {% if not session.logged_in %}
+    {% else %}
+    {% if client_items %}
+    {% for item in client_items %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ item.client_name }}</h3>
+        </div>
+        <div class="panel-body">
+            Информация об обменах
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
+</div>
 {% endblock %}
