@@ -74,21 +74,64 @@ class ObmenCurrentErrorItem(Base):
                     Rezult_posl_vigr=self.Rezult_posl_vigr, Comment_zagruzka=self.Comment_zagruzka,
                     Comment_vigruzka=self.Comment_vigruzka)
 
+class ObmenCurrentStatusItem(Base):
+     __tablename__ = u'obmen_current_status'
+
+     client_id = Column(String, primary_key=True)
+     uzelib = Column(String, primary_key=True)
+
+     Data_posl_zagr = Column(DateTime)
+     Data_posl_vigr = Column(DateTime)
+     Rezult_posl_zagr = Column(String)
+     Rezult_posl_vigr = Column(String)
+
+     Comment_zagruzka = Column(String)
+     Comment_vigruzka = Column(String)
+
+     Last_exchange = Column(DateTime)
+
+     def __init__(self, client_id, uzelib):
+         self.client_id = client_id
+         self.uzelib = uzelib
+
+     def __repr__(self):
+        return "<ObmenStatusItem id='%s'('%s')>" % (self.client_id, self.Last_exchange)
+
+     def getDictonary(self):
+        return dict(client_id=self.client_id, uzelib=self.uzelib, Data_posl_zagr=self.Data_posl_zagr,
+                    Data_posl_vigr=self.Data_posl_vigr, Rezult_posl_zagr=self.Rezult_posl_zagr,
+                    Rezult_posl_vigr=self.Rezult_posl_vigr, Comment_zagruzka=self.Comment_zagruzka,
+                    Comment_vigruzka=self.Comment_vigruzka, Last_exchange=self.Last_exchange)
+
+     def getJSData(self):
+         return {'client_id':      self.client_id,
+                 'uzelib':         self.uzelib,
+                 'Data_posl_zagr': self.Data_posl_zagr.strftime('%Y-%m-%d %H:%M:%S'),
+                 'Data_posl_vigr': self.Data_posl_vigr.strftime('%Y-%m-%d %H:%M:%S'),
+                 'Rezult_posl_zagr':self.Rezult_posl_zagr,
+                 'Rezult_posl_vigr':self.Rezult_posl_vigr,
+                 'Comment_zagruzka':self.Comment_zagruzka,
+                 'Comment_vigruzka':self.Comment_vigruzka,
+                 'Last_exchange'   :self.Last_exchange.strftime('%Y-%m-%d %H:%M:%S')}
+
+
 class ObmenLogClient(Base):
      __tablename__ = u'obmen_client'
 
      client_id = Column(String, primary_key=True)
      client_name = Column(String)
+     client_has_error = Column(Integer)
 
      def __init__(self, client_id, name):
          self.client_id = client_id
          self.client_name = name
+         self.client_has_error = 0
 
      def __repr__(self):
         return "<Client id='%s'('%s')>" % (self.client_id, self.client_name)
 
      def getDictonary(self):
-        return dict(client_id=self.client_id, client_name=self.client_name)
+        return dict(client_id=self.client_id, client_name=self.client_name, client_has_error=self.client_has_error)
 
 class ObmenMonitorService():
 
@@ -144,11 +187,28 @@ class ObmenMonitorService():
         self.session.merge(client_item)
         self.session.commit()
 
-def main():
+    def updateCurrentStatus(self,status_item):
+        self.session.merge(status_item)
+        self.session.commit()
 
+    def getObmenCurrentStatus(self, client_id, uzelib):
+        current_status = self.session.query(ObmenCurrentStatusItem).filter_by(client_id=client_id, uzelib=uzelib).one()
+        return current_status
+
+    def getObmenStatusForClient(self, client_id):
+        current_status_items = self.session.query(ObmenCurrentStatusItem).filter_by(client_id=client_id)
+        entries = [s.getJSData() for s in current_status_items]
+        return entries
+
+
+def main():
+    #metadata.drop_all()
     metadata.create_all()
+
     obmenMonitorService= ObmenMonitorService()
     #obmenMonitorService.updateClient(ObmenLogClient('123123','First client'))
- 
+    #current_status = obmenMonitorService.getObmenStatusForClient('5d857ac7-e265-446b-aa40-6741b17873fe')
+    #print current_status
+
 if __name__ == '__main__':
     main()

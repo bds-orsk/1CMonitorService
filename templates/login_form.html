@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+
+<form class="form-signin" action="{{ url_for('login')}}" method=post>
+        <h2 class="form-signin-heading">Пожалуйста авторизуйтесь</h2>
+        <label for="inputEmail" class="sr-only">Имя пользователя:</label>
+        <input type="text" id="username" class="form-control" placeholder="Имя пользователя" required autofocus>
+        <label for="inputPassword" class="sr-only">Пароль</label>
+        <input type="password" id="password" class="form-control" placeholder="Пароль" required>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Запомнить меня
+          </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+      </form>
+{% endblock %}
+
+

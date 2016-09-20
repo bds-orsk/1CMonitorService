@@ -16,6 +16,7 @@
           <td><b>...</td>
           <td><b>Имя</td>
           <td><b>ИДД Клиента</td>
+          <td><b>Есть ошибки</td>
         </tr>
         {% for item in client_items %}
         <tr>
@@ -24,6 +25,7 @@
 
             <td>{{ item.client_name }}</td>
             <td>{{ item.client_id }}</td>
+            <td>{{ item.client_has_error }}</td>
         </tr>
         {% endfor %}
       </table>

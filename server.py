@@ -2,15 +2,49 @@
 from flask import Flask, jsonify, request, abort, json, Response
 from flask import session, g, redirect, url_for, abort, render_template, flash
 
+import json
+
+from flask.ext.socketio import SocketIO, emit
+
 from functools import wraps
 
 import xml.etree.ElementTree as ET
 
-from ObmenMonitorDataService import ObmenLogItem, ObmenMonitorService, ObmenLogClient, ObmenCurrentErrorItem
+from ObmenMonitorDataService import ObmenLogItem, ObmenMonitorService, ObmenLogClient, ObmenCurrentErrorItem, ObmenCurrentStatusItem
 
 from datetime import datetime
+from time import strftime, gmtime
 
 app = Flask(__name__)
+
+import eventlet
+eventlet.monkey_patch()
+
+import time
+from threading import Thread
+thread = None
+
+socketio = SocketIO(app, async_mode="eventlet")
+
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        time.sleep(10)
+        count += 1
+        obmenMonitorService = ObmenMonitorService()
+        client_items = obmenMonitorService.getObmenClients()
+        datajs = []
+        for client_item in client_items:
+            client_obmen_status = obmenMonitorService.getObmenStatusForClient(client_item['client_id'])
+            datajs.append(dict(client=client_item, status_array=client_obmen_status))
+            #datajs.append(dict(client=client_item))
+
+
+        curTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S');
+        socketio.emit('my response',
+                      {'data': curTime, 'count': count, 'clients': json.dumps(datajs)},
+                      namespace='/test')
 
 def check_auth(username, password):
     """This function is called to check if a username /
@@ -36,10 +70,24 @@ def requires_auth(f):
 
 @app.route("/")
 def hello(errors=None):
+    global thread
+    if thread is None:
+        thread = Thread(target=background_thread)
+        thread.daemon = True
+        thread.start()
+    log_list=False
+    obmenMonitorService= ObmenMonitorService()
+    client_items = obmenMonitorService.getObmenClients()
+    #return render_template(u'index.html', errors=errors, log_list=log_list, client_items=client_items)
+    return render_template(u'landing.html')
+
+@app.route("/monitor")
+def monitor(errors=None):
     log_list=False
     obmenMonitorService= ObmenMonitorService()
     client_items = obmenMonitorService.getObmenClients()
     return render_template(u'index.html', errors=errors, log_list=log_list, client_items=client_items)
+    #return render_template(u'landing.html')
 
 @app.route("/log")
 #@requires_auth
@@ -70,7 +118,7 @@ def edit_client(clientid):
     return render_template(u'edit_client.html', client=client)
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET','POST'])
 def login():
     error = None
     if request.method == 'POST':
@@ -85,7 +133,8 @@ def login():
             session['username'] = ''
             print(request.form.get('password',None))
             return render_template(u'index.html', errors=error)
-
+    else:
+        return render_template(u'login_form.html', errors=error)
 
 @app.route('/logout')
 def logout():
@@ -97,47 +146,59 @@ def logout():
 @app.route("/post_log", methods=['POST'])
 @requires_auth
 def post_log():
-    #print(request.data)
     obmenMonitorService= ObmenMonitorService()
     root = ET.fromstring(request.data)
     client_id = root.attrib['IDKlient']
     client = ObmenLogClient(client_id,'')
-    obmenMonitorService.addClientItem(client)
+    client = obmenMonitorService.addClientItem(client)
     for child in root:
-        try:
-            period = datetime.strptime(child.attrib['period'],'%d.%m.%Y %H:%M:%S')
-        except:
-            period = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        # try:
+        #     period = datetime.strptime(child.attrib['period'],'%d.%m.%Y %H:%M:%S')
+        # except:
+        #     period = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        uzelib = child.attrib['uzelib']
 
-        li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
-        li.Comment_vigruzka = child.attrib['comment_vigruzka']
-        li.Comment_zagruzka = child.attrib['comment_zagruzka']
-        li.Rezult_posl_vigr = child.attrib['rezult_posl_vigr']
-        li.Rezult_posl_zagr = child.attrib['rezult_posl_zagr']
-        try:
-            li.Data_posl_zagr = datetime.strptime(child.attrib['data_posl_zagr'],'%d.%m.%Y %H:%M:%S')
-        except:
-            li.Data_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
-        try:
-            li.Data_posl_vigr = datetime.strptime(child.attrib['data_posl_vigr'],'%d.%m.%Y %H:%M:%S')
-        except:
-            li.Data_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
-        try:
-            li.Data_nachala_posl_vigr = datetime.strptime(child.attrib['data_nachala_posl_vigr'],'%d.%m.%Y %H:%M:%S')
-        except:
-            li.Data_nachala_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
-        try:
-            li.Data_nachala_posl_zagr = datetime.strptime(child.attrib['data_nachala_posl_zagr'],'%d.%m.%Y %H:%M:%S')
-        except:
-            li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        #Получим текущее состояние обмена и изменим его
+        current_status = obmenMonitorService.getObmenCurrentStatus(client_id, uzelib)
+        if current_status:
+            pass
+        else:
+            current_status = ObmenCurrentStatusItem(client_id,uzelib)
 
-        obmenMonitorService.addObmenLogItem(li)
+        res_vigr = child.attrib['rezult_posl_vigr']
+        res_zagr = child.attrib['rezult_posl_zagr']
 
-        if (li.Rezult_posl_zagr == "Нет"):
-            li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
-            ei = ObmenCurrentErrorItem(client_id, period, li.uzelib)
-            ei.Comment_vigruzka = li.Comment_vigruzka
-            obmenMonitorService.addObmenErrorItem(ei)
+        if res_vigr:
+            current_status.Comment_vigruzka = child.attrib['comment_vigruzka']
+            current_status.Rezult_posl_vigr = child.attrib['rezult_posl_vigr']
+            try:
+                current_status.Data_posl_vigr = datetime.strptime(child.attrib['data_posl_vigr'],'%d.%m.%Y %H:%M:%S')
+            except:
+                current_status.Data_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+
+        if res_zagr:
+
+            current_status.Comment_zagruzka = child.attrib['comment_zagruzka']
+            current_status.Rezult_posl_zagr = child.attrib['rezult_posl_zagr']
+
+            try:
+                current_status.Data_posl_zagr = datetime.strptime(child.attrib['data_posl_zagr'],'%d.%m.%Y %H:%M:%S')
+            except:
+                current_status.Data_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+
+        # try:
+        #     li.Data_nachala_posl_vigr = datetime.strptime(child.attrib['data_nachala_posl_vigr'],'%d.%m.%Y %H:%M:%S')
+        # except:
+        #     li.Data_nachala_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        # try:
+        #     li.Data_nachala_posl_zagr = datetime.strptime(child.attrib['data_nachala_posl_zagr'],'%d.%m.%Y %H:%M:%S')
+        # except:
+        #     li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+
+        #obmenMonitorService.addObmenLogItem(li)
+
+        current_status.Last_exchange = datetime.now()
+        obmenMonitorService.updateCurrentStatus(current_status)
 
     return render_template(u'show_log.html')
 
@@ -149,7 +210,7 @@ def put_log():
     root = ET.fromstring(request.data)
     client_id = root.attrib['IDKlient']
     client = ObmenLogClient(client_id,'')
-    obmenMonitorService.addClientItem(client)
+    client = obmenMonitorService.addClientItem(client)
     for child in root:
         try:
             period = datetime.strptime(child.attrib['period'],'%d.%m.%Y %H:%M:%S')
@@ -180,14 +241,24 @@ def put_log():
 
         obmenMonitorService.addObmenLogItem(li)
 
-        if (li.Rezult_posl_zagr == "Нет"):
+        if (li.Rezult_posl_zagr == u"Нет"):
             li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
             ei = ObmenCurrentErrorItem(client_id, period, li.uzelib)
             ei.Comment_vigruzka = li.Comment_vigruzka
             obmenMonitorService.addObmenErrorItem(ei)
+            client.client_has_error = 1
+            obmenMonitorService.updateClient(client)
+            socketio.emit('my response',
+                      {'data': 'Server put request'},
+                      namespace='/test')
+
     return render_template(u'show_log.html')
 
+@socketio.on('connect', namespace='/test')
+def test_connect():
+    emit('my response', {'data': 'Connected', 'count': 0})
 
 if __name__ == "__main__":
    app.secret_key = 'sadkghsdkjfghadjghjksdgh'
-   app.run(host='localhost',port=8088, debug=False)
+   #app.run(host='localhost',port=8088, debug=False)
+   socketio.run(app, host='localhost', port=8088)
