@@ -192,7 +192,10 @@ class ObmenMonitorService():
         self.session.commit()
 
     def getObmenCurrentStatus(self, client_id, uzelib):
-        current_status = self.session.query(ObmenCurrentStatusItem).filter_by(client_id=client_id, uzelib=uzelib).one()
+        try:
+            current_status = self.session.query(ObmenCurrentStatusItem).filter_by(client_id=client_id, uzelib=uzelib).one()
+        except:
+            current_status = None
         return current_status
 
     def getObmenStatusForClient(self, client_id):
@@ -206,9 +209,11 @@ def main():
     metadata.create_all()
 
     obmenMonitorService= ObmenMonitorService()
+    current_status = obmenMonitorService.getObmenCurrentStatus("5d857ac7-e265-446b-aa40-6741b17873fe", u"Центр")
+
     #obmenMonitorService.updateClient(ObmenLogClient('123123','First client'))
     #current_status = obmenMonitorService.getObmenStatusForClient('5d857ac7-e265-446b-aa40-6741b17873fe')
-    #print current_status
+    print current_status
 
 if __name__ == '__main__':
     main()

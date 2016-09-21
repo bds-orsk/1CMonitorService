@@ -203,7 +203,7 @@ def post_log():
     return render_template(u'show_log.html')
 
 @app.route("/put_log", methods=['PUT'])
-@requires_auth
+#@requires_auth
 def put_log():
     #print(request.data)
     # obmenMonitorService= ObmenMonitorService()
