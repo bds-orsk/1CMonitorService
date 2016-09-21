@@ -206,51 +206,91 @@ def post_log():
 @requires_auth
 def put_log():
     #print(request.data)
+    # obmenMonitorService= ObmenMonitorService()
+    # root = ET.fromstring(request.data)
+    # client_id = root.attrib['IDKlient']
+    # client = ObmenLogClient(client_id,'')
+    # client = obmenMonitorService.addClientItem(client)
+    # for child in root:
+    #     try:
+    #         period = datetime.strptime(child.attrib['period'],'%d.%m.%Y %H:%M:%S')
+    #     except:
+    #         period = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+    #
+    #     li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
+    #     li.Comment_vigruzka = child.attrib['comment_vigruzka']
+    #     li.Comment_zagruzka = child.attrib['comment_zagruzka']
+    #     li.Rezult_posl_vigr = child.attrib['rezult_posl_vigr']
+    #     li.Rezult_posl_zagr = child.attrib['rezult_posl_zagr']
+    #     try:
+    #         li.Data_posl_zagr = datetime.strptime(child.attrib['data_posl_zagr'],'%d.%m.%Y %H:%M:%S')
+    #     except:
+    #         li.Data_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+    #     try:
+    #         li.Data_posl_vigr = datetime.strptime(child.attrib['data_posl_vigr'],'%d.%m.%Y %H:%M:%S')
+    #     except:
+    #         li.Data_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+    #     try:
+    #         li.Data_nachala_posl_vigr = datetime.strptime(child.attrib['data_nachala_posl_vigr'],'%d.%m.%Y %H:%M:%S')
+    #     except:
+    #         li.Data_nachala_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+    #     try:
+    #         li.Data_nachala_posl_zagr = datetime.strptime(child.attrib['data_nachala_posl_zagr'],'%d.%m.%Y %H:%M:%S')
+    #     except:
+    #         li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+    #
+    #     obmenMonitorService.addObmenLogItem(li)
+    #
+    #     if (li.Rezult_posl_zagr == u"Нет"):
+    #         li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
+    #         ei = ObmenCurrentErrorItem(client_id, period, li.uzelib)
+    #         ei.Comment_vigruzka = li.Comment_vigruzka
+    #         obmenMonitorService.addObmenErrorItem(ei)
+    #         client.client_has_error = 1
+    #         obmenMonitorService.updateClient(client)
+    #         socketio.emit('my response',
+    #                   {'data': 'Server put request'},
+    #                   namespace='/test')
+    #
+    # return render_template(u'show_log.html')
     obmenMonitorService= ObmenMonitorService()
     root = ET.fromstring(request.data)
     client_id = root.attrib['IDKlient']
     client = ObmenLogClient(client_id,'')
     client = obmenMonitorService.addClientItem(client)
     for child in root:
-        try:
-            period = datetime.strptime(child.attrib['period'],'%d.%m.%Y %H:%M:%S')
-        except:
-            period = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        uzelib = child.attrib['uzelib']
 
-        li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
-        li.Comment_vigruzka = child.attrib['comment_vigruzka']
-        li.Comment_zagruzka = child.attrib['comment_zagruzka']
-        li.Rezult_posl_vigr = child.attrib['rezult_posl_vigr']
-        li.Rezult_posl_zagr = child.attrib['rezult_posl_zagr']
-        try:
-            li.Data_posl_zagr = datetime.strptime(child.attrib['data_posl_zagr'],'%d.%m.%Y %H:%M:%S')
-        except:
-            li.Data_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
-        try:
-            li.Data_posl_vigr = datetime.strptime(child.attrib['data_posl_vigr'],'%d.%m.%Y %H:%M:%S')
-        except:
-            li.Data_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
-        try:
-            li.Data_nachala_posl_vigr = datetime.strptime(child.attrib['data_nachala_posl_vigr'],'%d.%m.%Y %H:%M:%S')
-        except:
-            li.Data_nachala_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
-        try:
-            li.Data_nachala_posl_zagr = datetime.strptime(child.attrib['data_nachala_posl_zagr'],'%d.%m.%Y %H:%M:%S')
-        except:
-            li.Data_nachala_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+        #Получим текущее состояние обмена и изменим его
+        current_status = obmenMonitorService.getObmenCurrentStatus(client_id, uzelib)
+        if current_status:
+            pass
+        else:
+            current_status = ObmenCurrentStatusItem(client_id,uzelib)
 
-        obmenMonitorService.addObmenLogItem(li)
+        res_vigr = child.attrib['rezult_posl_vigr']
+        res_zagr = child.attrib['rezult_posl_zagr']
 
-        if (li.Rezult_posl_zagr == u"Нет"):
-            li = ObmenLogItem(client_id, period, child.attrib['uzelib'])
-            ei = ObmenCurrentErrorItem(client_id, period, li.uzelib)
-            ei.Comment_vigruzka = li.Comment_vigruzka
-            obmenMonitorService.addObmenErrorItem(ei)
-            client.client_has_error = 1
-            obmenMonitorService.updateClient(client)
-            socketio.emit('my response',
-                      {'data': 'Server put request'},
-                      namespace='/test')
+        if res_vigr:
+            current_status.Comment_vigruzka = child.attrib['comment_vigruzka']
+            current_status.Rezult_posl_vigr = child.attrib['rezult_posl_vigr']
+            try:
+                current_status.Data_posl_vigr = datetime.strptime(child.attrib['data_posl_vigr'],'%d.%m.%Y %H:%M:%S')
+            except:
+                current_status.Data_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+
+        if res_zagr:
+
+            current_status.Comment_zagruzka = child.attrib['comment_zagruzka']
+            current_status.Rezult_posl_zagr = child.attrib['rezult_posl_zagr']
+
+            try:
+                current_status.Data_posl_zagr = datetime.strptime(child.attrib['data_posl_zagr'],'%d.%m.%Y %H:%M:%S')
+            except:
+                current_status.Data_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+
+        current_status.Last_exchange = datetime.now()
+        obmenMonitorService.updateCurrentStatus(current_status)
 
     return render_template(u'show_log.html')
 
