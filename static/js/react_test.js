@@ -5,6 +5,8 @@ var ClientStatus = React.createClass({
                 var r_date = new Date(current_date - date_last_exchange);
                 var style_row  = {};
                 var have_error = false;
+                //var style_table = {fontSize: '10px'};
+                //var style_table = {};
 
                 //проверка на то что данные вообще к нам приходят
                 if (r_date.getMinutes() > 20){
@@ -19,9 +21,9 @@ var ClientStatus = React.createClass({
                     style_row = {backgroundColor: '#F3B9B9'};
                     have_error = true;
                     if(this.props.Rezult_posl_zagr == "Нет"){
-                        var style_z = {backgroundColor: '#F68888'};
+                        var style_z = {backgroundColor: '#F68888', fontSize: '10px'};
                     }else{
-                        var style_v = {backgroundColor: '#F68888'};
+                        var style_v = {backgroundColor: '#F68888', fontSize: '10px'};
                     }
 
                 }else{
@@ -74,6 +76,7 @@ var ClientStatus = React.createClass({
 
 var Client = React.createClass({
             render: function() {
+                var style_table = {fontSize: '12px'};
                 return (
                     <div className="client">
                         <div className="client-info">
@@ -82,7 +85,7 @@ var Client = React.createClass({
                                     <h3 className="panel-title">{this.props.name}</h3>
                                 </div>
 
-                                 <table className="table">
+                                 <table className="table" style={style_table}>
                                     <tr>
                                     <td><b>Узел ИБ</b></td>
                                     <td><b>Загрузка</b></td>

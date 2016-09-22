@@ -70,19 +70,25 @@ def requires_auth(f):
 
 @app.route("/")
 def hello(errors=None):
-    global thread
-    if thread is None:
-        thread = Thread(target=background_thread)
-        thread.daemon = True
-        thread.start()
-    log_list=False
-    obmenMonitorService= ObmenMonitorService()
-    client_items = obmenMonitorService.getObmenClients()
+    # global thread
+    # if thread is None:
+    #     thread = Thread(target=background_thread)
+    #     thread.daemon = True
+    #     thread.start()
+    # log_list=False
+    #obmenMonitorService= ObmenMonitorService()
+    #client_items = obmenMonitorService.getObmenClients()
     #return render_template(u'index.html', errors=errors, log_list=log_list, client_items=client_items)
     return render_template(u'landing.html')
 
 @app.route("/monitor")
 def monitor(errors=None):
+    log_list=False
+    global thread
+    if thread is None:
+        thread = Thread(target=background_thread)
+        thread.daemon = True
+        thread.start()
     log_list=False
     obmenMonitorService= ObmenMonitorService()
     client_items = obmenMonitorService.getObmenClients()
@@ -126,13 +132,13 @@ def login():
             error = u''
             session['logged_in'] = True
             session['username'] = request.form['username']
-            return redirect(url_for('hello'))
+            return redirect(url_for('monitor'))
         else:
             error=u'Не верный  логин или пароль'
             session['logged_in'] = False
             session['username'] = ''
             print(request.form.get('password',None))
-            return render_template(u'index.html', errors=error)
+            return render_template(u'login_form.html', errors=error)
     else:
         return render_template(u'login_form.html', errors=error)
 

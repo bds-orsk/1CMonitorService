@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, Boolean, Numeric, ForeignKey, Da
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import backref, relation
+from datetime import datetime
 
 ROOT_PATH=os.path.dirname(__file__)
 
@@ -104,10 +105,21 @@ class ObmenCurrentStatusItem(Base):
                     Comment_vigruzka=self.Comment_vigruzka, Last_exchange=self.Last_exchange)
 
      def getJSData(self):
+         try:
+            Data_posl_zagr = self.Data_posl_zagr.strftime('%Y-%m-%d %H:%M:%S')
+         except:
+            #Data_posl_zagr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+            Data_posl_zagr = ""
+         try:
+            Data_posl_vigr = self.Data_posl_vigr.strftime('%Y-%m-%d %H:%M:%S')
+         except:
+            #Data_posl_vigr = datetime.strptime("01.01.0001 00:00:00",'%d.%m.%Y %H:%M:%S')
+            Data_posl_vigr = ""
+
          return {'client_id':      self.client_id,
                  'uzelib':         self.uzelib,
-                 'Data_posl_zagr': self.Data_posl_zagr.strftime('%Y-%m-%d %H:%M:%S'),
-                 'Data_posl_vigr': self.Data_posl_vigr.strftime('%Y-%m-%d %H:%M:%S'),
+                 'Data_posl_zagr': Data_posl_zagr,
+                 'Data_posl_vigr': Data_posl_vigr,
                  'Rezult_posl_zagr':self.Rezult_posl_zagr,
                  'Rezult_posl_vigr':self.Rezult_posl_vigr,
                  'Comment_zagruzka':self.Comment_zagruzka,
