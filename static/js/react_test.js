@@ -113,7 +113,7 @@ var Client = React.createClass({
                                     <h3 className="panel-title">{this.props.name}</h3>
                                 </div>
 
-                                 <table className="table" style={style_table}>
+                                 <table className="table table-condensed" style={style_table}>
                                     <tr>
                                     <td><b>Узел ИБ</b></td>
                                     <td><b>Загрузка</b></td>
