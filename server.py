@@ -30,7 +30,7 @@ def background_thread():
     """Example of how to send server generated events to clients."""
     count = 0
     while True:
-        time.sleep(10)
+
         count += 1
         obmenMonitorService = ObmenMonitorService()
         client_items = obmenMonitorService.getObmenClients()
@@ -45,6 +45,7 @@ def background_thread():
         socketio.emit('my response',
                       {'data': curTime, 'count': count, 'clients': json.dumps(datajs)},
                       namespace='/test')
+        time.sleep(5)
 
 def check_auth(username, password):
     """This function is called to check if a username /

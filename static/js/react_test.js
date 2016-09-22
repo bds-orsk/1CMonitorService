@@ -2,11 +2,39 @@ var ClientStatus = React.createClass({
             render: function() {
                 var current_date = new Date();
                 var date_last_exchange = new Date(Date.parse(this.props.Last_exchange));
+                var date_last_in = new Date(Date.parse(this.props.Data_posl_zagr));
+                var date_last_out = new Date(Date.parse(this.props.Data_posl_vigr));
                 var r_date = new Date(current_date - date_last_exchange);
                 var style_row  = {};
                 var have_error = false;
                 //var style_table = {fontSize: '10px'};
                 //var style_table = {};
+                var date_last_exchange_string ="";
+                var date_last_vigr_string ="";
+                var date_last_zagr_string ="";
+
+                if (date_last_exchange.getFullYear() == current_date.getFullYear() && date_last_exchange.getMonth() == current_date.getMonth() && date_last_exchange.getDate() == current_date.getDate()){
+                    date_last_exchange_string = ""+date_last_exchange.toLocaleTimeString();
+                }
+                else{
+                    date_last_exchange_string = date_last_exchange;
+                };
+
+                if (date_last_out){
+                if (date_last_out.getFullYear() == current_date.getFullYear() && date_last_out.getMonth() == current_date.getMonth() && date_last_out.getDate() == current_date.getDate()){
+                    date_last_vigr_string = ""+date_last_out.toLocaleTimeString();
+                }
+                else{
+                    date_last_vigr_string = this.props.Data_posl_vigr;
+                };}
+
+                if (date_last_in){
+                if (date_last_in.getFullYear() == current_date.getFullYear() && date_last_in.getMonth() == current_date.getMonth() && date_last_in.getDate() == current_date.getDate()){
+                    date_last_zagr_string = ""+date_last_in.toLocaleTimeString();
+                }
+                else{
+                    date_last_zagr_string = this.props.Data_posl_zagr;
+                };}
 
                 //проверка на то что данные вообще к нам приходят
                 if (r_date.getMinutes() > 20){
@@ -37,17 +65,17 @@ var ClientStatus = React.createClass({
                         <td> <b>{this.props.uzelib} </b></td>
                         <td style={style_z}> {this.props.Rezult_posl_zagr}
                              <br></br>
-                             {this.props.Data_posl_zagr}
+                             {date_last_zagr_string}
                              <br></br>
                              {this.props.Comment_zagruzka}
                         </td>
                         <td style={style_v}> {this.props.Rezult_posl_vigr}
                             <br></br>
-                            {this.props.Data_posl_vigr}
+                            {date_last_vigr_string}
                             <br></br>
                              {this.props.Comment_vigruzka}
                         </td>
-                        <td style={style}> {this.props.Last_exchange}
+                        <td style={style}> {date_last_exchange_string}
 
                          </td>
                         </tr>
@@ -57,14 +85,14 @@ var ClientStatus = React.createClass({
                         <tr style={style_row}>
                         <td> {this.props.uzelib} </td>
                         <td> {this.props.Rezult_posl_zagr}
-                             <br></br>
-                             {this.props.Data_posl_zagr}
+                                &emsp;
+                             {date_last_zagr_string}
                         </td>
                         <td> {this.props.Rezult_posl_vigr}
-                            <br></br>
-                            {this.props.Data_posl_vigr}
+                                &emsp;
+                            {date_last_vigr_string}
                         </td>
-                        <td style={style}> {this.props.Last_exchange}
+                        <td style={style}> {date_last_exchange_string}
 
                          </td>
                         </tr>
@@ -124,6 +152,7 @@ var Client = React.createClass({
 
             componentDidMount: function() {
                 var namespace = '/test';
+
                 this.socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
                 this.socket.on('my response', this.socket_on);
             },
@@ -136,6 +165,9 @@ var Client = React.createClass({
                     var jsonObj = JSON.parse(msg.clients);
                     this.setState({displayedClients: jsonObj});
                 }
+                else{
+                    this.setState({displayedClients: []});
+                }
             },
 
             render: function() {
@@ -143,6 +175,7 @@ var Client = React.createClass({
                     <div className="clients">
                         <div className="clients-list">
                             {
+
                                this.state.displayedClients.map(function(el) {
                                     return <Client
                                         key={el.client.client_id}
