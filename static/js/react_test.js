@@ -81,7 +81,7 @@ var ClientStatus = React.createClass({
                                 <span className="glyphicon glyphicon-signal" aria-hidden="true" style={style_ping}> {date_last_exchange_string}</span>
                             </p>
 
-                                <img src={picture_path} width="60" height="80"></img>
+                                <img src={picture_path} width="40" height="60"></img>
 
                                 <div class="caption">
                                     <div style={style_name}>{this.props.uzelib}</div>
