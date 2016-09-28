@@ -13,12 +13,14 @@ var ClientStatus = React.createClass({
                 var date_last_vigr_string ="";
                 var date_last_zagr_string ="";
 
+
                 if (date_last_exchange.getFullYear() == current_date.getFullYear() && date_last_exchange.getMonth() == current_date.getMonth() && date_last_exchange.getDate() == current_date.getDate()){
                     date_last_exchange_string = ""+date_last_exchange.toLocaleTimeString();
                 }
                 else{
-                    date_last_exchange_string = date_last_exchange;
+                    date_last_exchange_string = ""+date_last_exchange.toLocaleDateString() + " " + date_last_exchange.toLocaleTimeString();
                 };
+
 
                 if (date_last_out){
                 if (date_last_out.getFullYear() == current_date.getFullYear() && date_last_out.getMonth() == current_date.getMonth() && date_last_out.getDate() == current_date.getDate()){
@@ -28,6 +30,7 @@ var ClientStatus = React.createClass({
                     date_last_vigr_string = this.props.Data_posl_vigr;
                 };}
 
+
                 if (date_last_in){
                 if (date_last_in.getFullYear() == current_date.getFullYear() && date_last_in.getMonth() == current_date.getMonth() && date_last_in.getDate() == current_date.getDate()){
                     date_last_zagr_string = ""+date_last_in.toLocaleTimeString();
@@ -36,69 +39,65 @@ var ClientStatus = React.createClass({
                     date_last_zagr_string = this.props.Data_posl_zagr;
                 };}
 
+
+
+
                 //проверка на то что данные вообще к нам приходят
-                if (r_date.getMinutes() > 20){
-                    var style = { backgroundColor: 'red' };
+                if ((r_date.getMinutes() > 20)||(r_date.getDate() >1)){
+                    var style_ping = { color: 'red', fontSize: '12px' };
                 }
                 else{
-                    var style = { };
+                    var style_ping = { color: 'green', fontSize: '12px' };
                 };
+
 
                 //проверка явных косяков
-                if ((this.props.Rezult_posl_zagr == "Нет")||(this.props.Rezult_posl_vigr == "Нет")){
-                    style_row = {backgroundColor: '#F3B9B9'};
+                 have_error = false;
+                 if(this.props.Rezult_posl_zagr == "Нет"){
+                    var style_row_in = {color: '#F68888', fontSize: '12px'};
                     have_error = true;
-                    if(this.props.Rezult_posl_zagr == "Нет"){
-                        var style_z = {backgroundColor: '#F68888', fontSize: '10px'};
-                    }else{
-                        var style_v = {backgroundColor: '#F68888', fontSize: '10px'};
-                    }
+                 }else{
+                    var style_row_in = {fontSize: '12px'};
+                 }
+                  if(this.props.Rezult_posl_vigr == "Нет"){
+                    var style_row_out = {color: '#F68888', fontSize: '12px'};
+                    have_error = true;
+                 }else{
+                    var style_row_out = {fontSize: '12px'};
+                 }
 
-                }else{
-                    style_row = {};
-                    have_error = false;
-                };
 
                 if (have_error){
-                     return (
-                        <tr style={style_row}>
-                        <td> <b>{this.props.uzelib} </b></td>
-                        <td style={style_z}> {this.props.Rezult_posl_zagr}
-                             <br></br>
-                             {date_last_zagr_string}
-                             <br></br>
-                             {this.props.Comment_zagruzka}
-                        </td>
-                        <td style={style_v}> {this.props.Rezult_posl_vigr}
-                            <br></br>
-                            {date_last_vigr_string}
-                            <br></br>
-                             {this.props.Comment_vigruzka}
-                        </td>
-                        <td style={style}> {date_last_exchange_string}
-
-                         </td>
-                        </tr>
-                );
+                    var picture_path = "static/img/db_er.png";
                 }else{
-                     return (
-                        <tr style={style_row}>
-                        <td> {this.props.uzelib} </td>
-                        <td> {this.props.Rezult_posl_zagr}
-                                &emsp;
-                             {date_last_zagr_string}
-                        </td>
-                        <td> {this.props.Rezult_posl_vigr}
-                                &emsp;
-                            {date_last_vigr_string}
-                        </td>
-                        <td style={style}> {date_last_exchange_string}
-
-                         </td>
-                        </tr>
-                );
+                    var picture_path = "static/img/db.png";
                 }
 
+                return(
+
+                        <div className="col-xs-6 col-md-2">
+                            <div className="thumbnail">
+                            <p>
+                                <span className="glyphicon glyphicon-signal" aria-hidden="true" style={style_ping}> {date_last_exchange_string}</span>
+                            </p>
+
+                                <img src={picture_path} width="60" height="80"></img>
+
+                                <div class="caption">
+                                    {this.props.uzelib}
+                                    <p>
+                                        <span className="glyphicon glyphicon-log-in" aria-hidden="true" style={style_row_in}> {date_last_zagr_string}</span>
+                                     </p>
+                                     <p>
+                                        <span className="glyphicon glyphicon-log-out" aria-hidden="true" style={style_row_out}> {date_last_vigr_string}</span>
+                                    </p>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                );
             }
         });
 
@@ -113,13 +112,7 @@ var Client = React.createClass({
                                     <h3 className="panel-title">{this.props.name}</h3>
                                 </div>
 
-                                 <table className="table table-condensed" style={style_table}>
-                                    <tr>
-                                    <td><b>Узел ИБ</b></td>
-                                    <td><b>Загрузка</b></td>
-                                    <td><b>Выгрузка</b></td>
-                                    <td><b>Получение данных</b></td>
-                                    </tr>
+                                    <div className="row">
                                          {
                                             this.props.status_array.map(function(el) {
                                              return <ClientStatus
@@ -135,7 +128,8 @@ var Client = React.createClass({
                                             />;
                                              })
                                          }
-                                 </table>
+                                     </div>
+
                             </div>
                         </div>
                     </div>
