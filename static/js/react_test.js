@@ -85,7 +85,7 @@ var ClientStatus = React.createClass({
                                 <span className="glyphicon glyphicon-signal" aria-hidden="true" style={style_ping}> {date_last_exchange_string}</span>
                             </p>
 
-                                <a href="#" data-toggle="modal" data-target={id_modal_window}><img src={picture_path} width="60" height="70"></img></a>
+                                <a href="#" data-toggle="modal" data-target={id_modal_window}><img src={picture_path} width="60" height="40"></img></a>
 
                                 <div className="caption">
                                     <div style={style_name}>{this.props.uzelib}</div>
