@@ -7,7 +7,7 @@ var ClientStatus = React.createClass({
                 var r_date = new Date(current_date - date_last_exchange);
                 var style_row  = {};
                 var have_error = false;
-                var style_name = {fontSize: '11px'};
+                var style_name = {fontSize: '10px'};
                 //var style_table = {};
                 var date_last_exchange_string ="";
                 var date_last_vigr_string ="";
@@ -84,11 +84,12 @@ var ClientStatus = React.createClass({
                             <p>
                                 <span className="glyphicon glyphicon-signal" aria-hidden="true" style={style_ping}> {date_last_exchange_string}</span>
                             </p>
+                            <div style={style_name}>{this.props.uzelib}</div>
 
-                                <a href="#" data-toggle="modal" data-target={id_modal_window}><img src={picture_path} width="60" height="40"></img></a>
+                                <a href="#" data-toggle="modal" data-target={id_modal_window}><img src={picture_path} width="40" height="20"></img></a>
 
                                 <div className="caption">
-                                    <div style={style_name}>{this.props.uzelib}</div>
+
                                     <p>
                                         <span className="glyphicon glyphicon-log-in" aria-hidden="true" style={style_row_in}>  {date_last_zagr_string}</span>
                                       </p>
