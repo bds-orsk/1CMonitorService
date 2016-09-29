@@ -73,29 +73,55 @@ var ClientStatus = React.createClass({
                     var picture_path = "static/img/db.png";
                 }
 
+                var id_modal_window = "#modal_"+this.props.uzelib;
+                var id_modal_window1 = "modal_"+this.props.uzelib;
+
                 return(
 
                         <div className="col-xs-6 col-md-2">
+
                             <div className="thumbnail">
                             <p>
                                 <span className="glyphicon glyphicon-signal" aria-hidden="true" style={style_ping}> {date_last_exchange_string}</span>
                             </p>
 
-                                <img src={picture_path} width="40" height="60"></img>
+                                <a href="#" data-toggle="modal" data-target={id_modal_window}><img src={picture_path} width="40" height="60"></img></a>
 
-                                <div class="caption">
+                                <div className="caption">
                                     <div style={style_name}>{this.props.uzelib}</div>
                                     <p>
-                                        <span className="glyphicon glyphicon-log-in" aria-hidden="true" style={style_row_in}> {date_last_zagr_string}</span>
-                                     </p>
+                                        <span className="glyphicon glyphicon-log-in" aria-hidden="true" style={style_row_in}>  {date_last_zagr_string}</span>
+                                      </p>
                                      <p>
                                         <span className="glyphicon glyphicon-log-out" aria-hidden="true" style={style_row_out}> {date_last_vigr_string}</span>
                                     </p>
 
                                 </div>
+
+                            </div>
+
+                            <div id={id_modal_window1} className="modal fade" tabIndex="-1" role="dialog">
+                              <div className="modal-dialog">
+                                <div className="modal-content">
+                                  <div className="modal-header">
+                                    <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 className="modal-title">Состояние обмена по базе: {this.props.uzelib}</h4>
+                                  </div>
+                                  <div className="modal-body">
+                                    <h5>Загрузка данных:</h5>
+                                    <h6>{this.props.Rezult_posl_zagr}</h6>
+                                    <h6>{this.props.Comment_zagruzka}</h6>
+                                    <h5>Выгрузка данных:</h5>
+                                    <h6>{this.props.Rezult_posl_vigr}</h6>
+                                    <h6>{this.props.Comment_vigruzka}</h6>
+                                  </div>
+                                  <div className="modal-footer">
+                                    <button type="button" className="btn btn-default" data-dismiss="modal">Закрыть</button>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                         </div>
-
 
                 );
             }
