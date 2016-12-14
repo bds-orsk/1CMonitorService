@@ -8,6 +8,29 @@
 <dd><input type=text name=name value ={{client.client_name}}>
 <dd><input type=text name=clientid value ={{client.client_id}}>
 
+    {% if uzels %}
+      <table class="table">
+        <tr>
+          <td><b>Узел</td>
+          <td><b>...</td>
+          <!--<td><b>Есть ошибки</td>-->
+        </tr>
+        {% for item in uzels %}
+        <tr>
+            <td>{{ item }}</td>
+            <td>
+                <a href="{{ url_for('delete_uzel', clientid=client.client_id, uzel=item) }}">
+	            <span class="glyphicon glyphicon-trash"></span>
+            </td>
+
+
+            <!--<td>{{ item.client_id }}</td>-->
+            <!--<td>{{ item.client_has_error }}</td>-->
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+
 <dd><input type=submit value=Ок>
 </dl>
 </form>

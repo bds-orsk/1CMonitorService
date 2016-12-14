@@ -199,6 +199,15 @@ class ObmenMonitorService():
         self.session.merge(client_item)
         self.session.commit()
 
+    def deleteClient(self,client_item):
+        self.session.delete(client_item)
+        self.session.commit()
+
+    def deleteClientUzel(self,client_id, uzel):
+        current_status = self.session.query(ObmenCurrentStatusItem).filter_by(client_id=client_id, uzelib=uzel).one()
+        self.session.delete(current_status)
+        self.session.commit()
+
     def updateCurrentStatus(self,status_item):
         self.session.merge(status_item)
         self.session.commit()
@@ -209,6 +218,11 @@ class ObmenMonitorService():
         except:
             current_status = None
         return current_status
+
+    def getUzelsForClient(self, client_id):
+        current_status_items = self.session.query(ObmenCurrentStatusItem).filter_by(client_id=client_id)
+        entries = [s.uzelib for s in current_status_items]
+        return entries
 
     def getObmenStatusForClient(self, client_id):
         current_status_items = self.session.query(ObmenCurrentStatusItem).filter_by(client_id=client_id)

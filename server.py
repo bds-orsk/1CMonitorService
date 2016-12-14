@@ -115,6 +115,7 @@ def client_items(errors=None):
 def edit_client(clientid):
     obmenMonitorService = ObmenMonitorService()
     client = obmenMonitorService.getClientByID(clientid)
+    uzels = obmenMonitorService.getUzelsForClient(clientid)
     if request.method == 'POST':
         client.client_name = request.form['name']
         client.client_id = request.form['clientid']
@@ -122,7 +123,20 @@ def edit_client(clientid):
         obmenMonitorService.updateClient(client)
         return redirect(url_for('client_items'))
 
-    return render_template(u'edit_client.html', client=client)
+    return render_template(u'edit_client.html', client=client, uzels=uzels)
+
+@app.route("/delete_client/<clientid>", methods=['GET', 'POST'])
+def delete_client(clientid):
+    obmenMonitorService = ObmenMonitorService()
+    client = obmenMonitorService.getClientByID(clientid)
+    obmenMonitorService.deleteClient(client)
+    return redirect(url_for('edit_client', clientid))
+
+@app.route("/delete_uzel/<clientid>/<uzel>", methods=['GET', 'POST'])
+def delete_uzel(clientid, uzel):
+    obmenMonitorService = ObmenMonitorService()
+    obmenMonitorService.deleteClientUzel(clientid, uzel)
+    return redirect(url_for('client_items'))
 
 
 @app.route('/login', methods=['GET','POST'])
@@ -206,6 +220,15 @@ def post_log():
 
         current_status.Last_exchange = datetime.now()
         obmenMonitorService.updateCurrentStatus(current_status)
+
+    return render_template(u'show_log.html')
+
+@app.route("/post_event", methods=['POST'])
+#@requires_auth
+def post_event():
+    obmenMonitorService= ObmenMonitorService()
+    root = request.data
+
 
     return render_template(u'show_log.html')
 
