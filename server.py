@@ -2,7 +2,10 @@
 from flask import Flask, jsonify, request, abort, json, Response
 from flask import session, g, redirect, url_for, abort, render_template, flash
 
+import sys
 import json
+import logging
+from logging.handlers import RotatingFileHandler
 
 from flask.ext.socketio import SocketIO, emit
 
@@ -180,7 +183,11 @@ def post_log():
         uzelib = child.attrib['uzelib']
 
         #Получим текущее состояние обмена и изменим его
-        current_status = obmenMonitorService.getObmenCurrentStatus(client_id, uzelib)
+        try:
+            current_status = obmenMonitorService.getObmenCurrentStatus(client_id, uzelib)
+        except:
+            app.logger.error('Error on  getObmenCurrentStatus()' + sys.exc_info()[0])
+
         if current_status:
             pass
         else:
@@ -219,7 +226,12 @@ def post_log():
         #obmenMonitorService.addObmenLogItem(li)
 
         current_status.Last_exchange = datetime.now()
-        obmenMonitorService.updateCurrentStatus(current_status)
+        try:
+            obmenMonitorService.updateCurrentStatus(current_status)
+        except:
+            app.logger.error('Error on  updateCurrentStatus()' + sys.exc_info()[0])
+
+
 
     return render_template(u'show_log.html')
 
@@ -331,4 +343,9 @@ def test_connect():
 if __name__ == "__main__":
    app.secret_key = 'sadkghsdkjfghadjghjksdgh'
    #app.run(host='localhost',port=8088, debug=False)
+
+   handler = RotatingFileHandler('1Cmonitor.log', maxBytes=10000, backupCount=1)
+   handler.setLevel(logging.INFO)
+   app.logger.addHandler(handler)
+
    socketio.run(app, host='localhost', port=8088)
